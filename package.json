@@ -1,5 +1,5 @@
 {
-  "name": "react-example",
+  "name": "netek-services",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,7 +7,9 @@
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "node -e \"import { rmSync } from 'fs'; ['dist','node_modules'].forEach(p => { try { rmSync(p, { recursive: true, force: true }); } catch {} });\"",
+    "rebuild:bin": "npm rebuild esbuild @tailwindcss/oxide --update-binary",
+    "postinstall": "npm rebuild esbuild @tailwindcss/oxide --update-binary || true",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
