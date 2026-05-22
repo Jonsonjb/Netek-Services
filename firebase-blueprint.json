@@ -1,0 +1,159 @@
+{
+  "entities": {
+    "PedidoPlanta": {
+      "title": "PedidoPlanta",
+      "description": "Calculo de materiais e solicitacao de planta",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "terrainDimensions": { "type": "string" },
+        "houseType": { "type": "string" },
+        "floors": { "type": "integer" },
+        "roomsCount": { "type": "integer" },
+        "livingRoomsCount": { "type": "integer" },
+        "kitchensCount": { "type": "integer" },
+        "porchesCount": { "type": "integer" },
+        "pantriesCount": { "type": "integer" },
+        "materialType": { "type": "string", "enum": ["bloco_15", "bloco_20"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "clientEmail": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["terrainDimensions", "houseType", "floors", "materialType", "createdAt"]
+    },
+    "VagaTrabalho": {
+      "title": "VagaTrabalho",
+      "description": "Vaga de trabalho publicada para o feed publico",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "neighborhood": { "type": "string" },
+        "budget": { "type": "number" },
+        "ownerContact": { "type": "string" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["title", "category", "neighborhood", "budget", "ownerContact", "description", "createdAt"]
+    },
+    "PedidoCV": {
+      "title": "PedidoCV",
+      "description": "Dados de Curriculo Profissional para elaboracao",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fullName": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "profession": { "type": "string" },
+        "experience": { "type": "string" },
+        "education": { "type": "string" },
+        "skills": { "type": "string" },
+        "objective": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["fullName", "phone", "email", "profession", "createdAt"]
+    },
+    "PedidoCarta": {
+      "title": "PedidoCarta",
+      "description": "Dados de Carta Formal para elaboracao",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fullName": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "recipient": { "type": "string" },
+        "purpose": { "type": "string" },
+        "bodyText": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["fullName", "phone", "email", "recipient", "purpose", "createdAt"]
+    },
+    "PedidoContrato": {
+      "title": "PedidoContrato",
+      "description": "Dados de Contrato Legal para elaboracao de minutos",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "clientName": { "type": "string" },
+        "clientIdNumber": { "type": "string" },
+        "contractType": { "type": "string" },
+        "contractValue": { "type": "number" },
+        "details": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["clientName", "contractType", "createdAt"]
+    },
+    "Imovel": {
+      "title": "Imovel",
+      "description": "Classificado de imovel ou terreno para venda ou aluguer",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "type": { "type": "string", "enum": ["Venda", "Aluguer"] },
+        "propertyType": { "type": "string", "enum": ["Terreno", "Casa"] },
+        "dimensions": { "type": "string" },
+        "location": { "type": "string" },
+        "price": { "type": "number" },
+        "duatStatus": { "type": "string", "enum": ["Com DUAT", "Sem DUAT"] },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string" }
+      },
+      "required": ["title", "type", "propertyType", "dimensions", "location", "price", "duatStatus", "createdAt"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Perfil de utilizador do Netek Services",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "address": { "type": "string" },
+        "profession": { "type": "string" },
+        "about": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "name"]
+    }
+  },
+  "firestore": {
+    "pedidos_plantas/{pedidoId}": {
+      "schema": "PedidoPlanta",
+      "description": "Colecao de pedidos de plantas e calculos de materiais"
+    },
+    "vagas_trabalho/{vagaId}": {
+      "schema": "VagaTrabalho",
+      "description": "Colecao de vagas de emprego publicadas pelos usuarios"
+    },
+    "pedidos_cv/{pedidoId}": {
+      "schema": "PedidoCV",
+      "description": "Colecao de pedidos de Curriculo Profissional"
+    },
+    "pedidos_cartas/{pedidoId}": {
+      "schema": "PedidoCarta",
+      "description": "Colecao de pedidos de Cartas Formais"
+    },
+    "pedidos_contratos/{pedidoId}": {
+      "schema": "PedidoContrato",
+      "description": "Colecao de pedidos de Contratos Legais"
+    },
+    "imoveis/{imovelId}": {
+      "schema": "Imovel",
+      "description": "Colecao de classificados de imoveis e terrenos"
+    },
+    "users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Colecao de perfis de utilizadores"
+    }
+  }
+}

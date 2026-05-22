@@ -1,0 +1,6 @@
+{
+  "name": "Netek Services",
+  "description": "Plataforma multi-modais de engenharia, empregos via FixMoz, elaboração de documentos digitais e intermediação de imóveis na Kayamoz (Moçambique).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
