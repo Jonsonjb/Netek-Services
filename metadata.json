@@ -1,6 +1,6 @@
 {
-  "name": "Netek Services",
-  "description": "Plataforma multi-modais de engenharia, empregos via FixMoz, elaboração de documentos digitais e intermediação de imóveis na Kayamoz (Moçambique).",
+  "name": "Autonomia e Renda Moçambique",
+  "description": "Portal oficial do Programa Autonomia e Renda no território de Moçambique, oferecendo capacitação profissional de excelência de forma 100% gratuita com bolsas-auxílio, em parceria com a Petrobras Moçambique e o IFPELAC.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

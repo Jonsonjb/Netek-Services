@@ -1,42 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #f4f6f9;
-  color: #2c3e50;
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --color-petro-blue: #005288;
+  --color-petro-green: #00A859;
+  --color-petro-yellow: #FFD100;
+  --color-bg-gray: #f8fafc;
 }
 
-/* Glass card effect from Sleek Interface design */
-.glass-card {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(44, 62, 80, 0.1);
-  box-shadow: 0 10px 30px -10px rgba(44, 62, 80, 0.08);
-}
+@layer utilities {
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
 
-/* Corporate brand color classes */
-.brand-blue {
-  background-color: #2c3e50;
-}
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-.brand-orange {
-  background-color: #ff6600;
-}
+  .animate-slide-in {
+    animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
 
-.text-brand-orange {
-  color: #ff6600;
-}
-
-.border-brand-orange {
-  border-color: #ff6600;
-}
-
-/* Smooth animations for module switching */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  .animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
 }

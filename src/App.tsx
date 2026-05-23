@@ -1,291 +1,304 @@
-import { useState, useEffect } from "react";
-import { auth } from "./firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import Navbar from "./components/Navbar";
-import AuthModal from "./components/AuthModal";
-import EngineeringModule from "./components/EngineeringModule";
-import FixMozModule from "./components/FixMozModule";
-import DigitalServicesModule from "./components/DigitalServicesModule";
-import KayamozModule from "./components/KayamozModule";
-import UserProfileModule from "./components/UserProfileModule";
-import CompanyModals, { CompanyModalType } from "./components/CompanyModals";
-import { getUserFriendlyName } from "./lib/userUtils";
-import {
-  Compass,
-  ArrowUpRight,
-  ShieldCheck,
-  Building2,
-  HardHat,
-  Network,
-  Phone,
-  BookmarkCheck,
-  Award,
-} from "lucide-react";
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  Plus, 
+  MapPin, 
+  Settings, 
+  Award, 
+  ArrowRight, 
+  TrendingUp, 
+  UserCheck, 
+  Laptop, 
+  GraduationCap, 
+  ShieldCheck, 
+  CheckCircle,
+  Clock,
+  Briefcase
+} from 'lucide-react';
+
+import Header from './components/Header';
+import Hero from './components/Hero';
+import BenefitCalculator from './components/BenefitCalculator';
+import CourseSelectorQuiz from './components/CourseSelectorQuiz';
+import CourseExplorer from './components/CourseExplorer';
+import RegistrationForm from './components/RegistrationForm';
+import ApplicationTracker from './components/ApplicationTracker';
+import HubsList from './components/HubsList';
+import FAQSection from './components/FAQSection';
+import Footer from './components/Footer';
+import SectorNews from './components/SectorNews';
+import Testimonials from './components/Testimonials';
+import { COURSES } from './data';
 
 export default function App() {
-  const [activeModule, setActiveModule] = useState("engenharia");
-  const [user, setUser] = useState<any>(null);
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [companyModal, setCompanyModal] = useState<CompanyModalType>(null);
+  const [activeSection, setActiveSection] = useState<string>('sobre');
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
 
-  const [isDataSaver, setIsDataSaver] = useState(() => {
-    return localStorage.getItem("netek_data_saver") === "true";
-  });
-
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem("netek_dark_mode") === "true";
-  });
-
-  useEffect(() => {
-    localStorage.setItem("netek_dark_mode", String(isDarkMode));
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDarkMode]);
-
-  const handleToggleDataSaver = () => {
-    const newVal = !isDataSaver;
-    setIsDataSaver(newVal);
-    localStorage.setItem("netek_data_saver", String(newVal));
+  // When user clicks 'Inscrever-se' on a particular course card
+  const handleApplyForCourse = (courseId: string) => {
+    setSelectedCourseId(courseId);
+    setActiveSection('inscricao');
+    
+    // Smooth scroll back to top of page/form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Sync session state natively with Firebase Auth
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
-        if (firebaseUser.email === "admin@jonsonjb.com") {
-          setIsAdminLoggedIn(true);
-        } else {
-          setIsAdminLoggedIn(false);
-        }
-      } else {
-        // If a mock virtual user is configured locally, preserve state unless user manually triggered signOut
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const handleAuthSuccess = (authenticatedUser: any) => {
-    setUser(authenticatedUser);
-    if (authenticatedUser.email === "admin@jonsonjb.com") {
-      setIsAdminLoggedIn(true);
-    } else {
-      setIsAdminLoggedIn(false);
-    }
+  // Callback from quiz results
+  const handleSelectCourseFromQuiz = (courseId: string) => {
+    setSelectedCourseId(courseId);
+    setActiveSection('cursos');
+    
+    // Smooth scroll to courses section
+    setTimeout(() => {
+      document.getElementById('course-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
-  const handleSignOut = () => {
-    setUser(null);
-    setIsAdminLoggedIn(false);
+  const clearQuizSelection = () => {
+    setSelectedCourseId(null);
+  };
+
+  const handleRegistrationCompleted = (protocol: string) => {
+    // We can redirect them to tracker or keep them on success page inside registration wizard
   };
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${isDarkMode ? "bg-slate-950 text-gray-100 dark" : "bg-[#f4f6f9]"}`} id="netek-root-app">
-      {/* 1. Header Navigation */}
-      <Navbar
-        activeModule={activeModule}
-        setActiveModule={setActiveModule}
-        user={user}
-        onSignOut={handleSignOut}
-        onOpenAuthModal={() => setIsAuthModalOpen(true)}
-        onOpenModal={setCompanyModal}
-        isDataSaver={isDataSaver}
-        onToggleDataSaver={handleToggleDataSaver}
-        isDarkMode={isDarkMode}
-        onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-      />
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-between font-sans selection:bg-petro-green selection:text-white">
+      {/* Shared Header Navigation */}
+      <Header activeSection={activeSection} setActiveSection={setActiveSection} />
 
-      {/* Hero Welcome banner with a Mozambican theme */}
-      <header className="bg-[#2c3e50] text-white py-10 px-4 border-t border-white/5 shadow-inner" id="hero-netek-banner">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 animate-fade-in">
-            <div className="inline-flex items-center gap-1.5 bg-[#ff6600]/25 px-3 py-1 rounded-full text-xs font-bold text-orange-300 uppercase tracking-widest border border-[#ff6600]/30">
-              <Compass className="h-3 w-3 animate-spin duration-1000" /> Mercado Digital de Moçambique
-            </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-              Ecosistema Multi-Serviços <span className="text-[#ff6600]">Netek</span>
-            </h1>
-            <p className="text-gray-300 text-sm md:text-base max-w-2xl leading-relaxed font-light">
-              Consulte materiais de construção com inteligência métrica, conecte-se com construtores locais na
-              FixMoz, solicite minutas de documentos legais ou encontre terrenos documentados na Kayamoz.
-            </p>
-          </div>
-
-          <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center gap-4 shrink-0 max-w-sm transition-all hover:bg-white/10">
-            <div className="bg-[#ff6600] text-white p-3 rounded-xl shadow-lg">
-              <Phone className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-xs text-gray-400 uppercase font-mono font-bold">Assistência WhatsApp</p>
-              <a
-                href="https://wa.me/258835109190"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white hover:text-[#ff6600] font-extrabold text-base block transition-colors mt-0.5"
-              >
-                +258 83 510 9190
-              </a>
-              <span className="text-[10px] text-orange-300 block">Director Geral: Jonson JB</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* 2. DYNAMIC INTRO PROMO CARDS (Disponíveis logo de cara, totalmente interativos) */}
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-6 grid grid-cols-1 md:grid-cols-3 gap-4" id="intro-promo-cards">
-        {/* Card 1: Cursos Grátis */}
-        <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/15 p-4 rounded-3xl flex flex-col justify-between hover:shadow-md transition-all gap-3">
-          <div className="space-y-1">
-            <span className="bg-emerald-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded font-mono">
-              Formações Grátis 🇲🇿
-            </span>
-            <h4 className="font-extrabold text-[#2c3e50] text-[13px] mt-1">Cursos Gratuitos Brevemente!</h4>
-            <p className="text-[11px] text-gray-550 leading-relaxed font-light">
-              No-Code, Excel para PMEs e AutoCAD de obra com diplomas virtuais homologados pela Netek.
-            </p>
-          </div>
-          <button
-            onClick={() => setCompanyModal("cursos")}
-            className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1 self-start cursor-pointer"
+      {/* Main Dynamically Rendered Content Container with Motion Transitions */}
+      <main className="flex-grow">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeSection}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
           >
-            Saber Mais e Inscrever-se →
-          </button>
-        </div>
+            {/* SCREEN 1: ABOUT / HOME LANDING */}
+            {activeSection === 'sobre' && (
+              <div className="space-y-16 pb-20">
+                {/* Hero Section Banner */}
+                <Hero onNavigate={setActiveSection} />
 
-        {/* Card 2: Sobre & Equipa */}
-        <div className="bg-gradient-to-br from-[#ff6600]/10 to-[#ff6600]/5 border border-[#ff6600]/15 p-4 rounded-3xl flex flex-col justify-between hover:shadow-md transition-all gap-3">
-          <div className="space-y-1">
-            <span className="bg-[#ff6600] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded font-mono">
-              Sobre Nós • Missão &amp; Visão
-            </span>
-            <h4 className="font-extrabold text-[#2c3e50] text-[13px] mt-1">Conheça o Propósito do Diretor Jonson JB</h4>
-            <p className="text-[11px] text-gray-550 leading-relaxed font-light">
-              Descubra por que disponibilizamos empregos, terrenos validados e cálculos de infraestruturas livres.
-            </p>
-          </div>
-          <button
-            onClick={() => setCompanyModal("sobre")}
-            className="text-[11px] font-bold text-[#ff6600] hover:text-[#d35400] hover:underline flex items-center gap-1 self-start cursor-pointer"
-          >
-            Nossa Proposta de Valor →
-          </button>
-        </div>
+                {/* Subpage Section: Why This Matters / Context in Mozambique */}
+                <section className="max-w-7xl mx-auto px-4 md:px-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    {/* Visual details column */}
+                    <div className="lg:col-span-5 space-y-6">
+                      <div className="p-3 bg-petro-green/10 text-petro-green w-12 h-12 rounded-2xl flex items-center justify-center">
+                        <TrendingUp className="w-6 h-6" />
+                      </div>
+                      
+                      <h3 className="text-2xl font-black text-slate-800 leading-tight">
+                        Por que investir no Capital Humano de Moçambique?
+                      </h3>
+                      
+                      <p className="text-slate-600 text-xs md:text-sm leading-relaxed">
+                        Moçambique está a posicionar-se como o maior hub de exportação de Gás Natural Liquefeito (LNG) de África, através de megaprojetos na Bacia do Rovuma. Para garantir que este crescimento gere prosperidade local, o programa capacita gratuitamente os moçambicanos para ingressar nas multinacionais de energia e tecnologia de forma imediata.
+                      </p>
 
-        {/* Card 3: Ajuda & Apoio */}
-        <div className="bg-gradient-to-br from-[#2c3e50]/5 to-[#2c3e50]/10 border border-[#2c3e50]/15 p-4 rounded-3xl flex flex-col justify-between hover:shadow-md transition-all gap-3">
-          <div className="space-y-1">
-            <span className="bg-[#2c3e50] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded font-mono">
-              Apoio Voluntário 💖
-            </span>
-            <h4 className="font-extrabold text-[#2c3e50] text-[13px] mt-1">Ajude a Manter o Portal Ativo</h4>
-            <p className="text-[11px] text-gray-550 leading-relaxed font-light">
-              Mantenha as nossas ferramentas, geradores de CV e calculadoras integradas no ar via M-Pesa.
-            </p>
-          </div>
-          <button
-            onClick={() => setCompanyModal("ajuda")}
-            className="text-[11px] font-bold text-[#2c3e50] hover:underline flex items-center gap-1 self-start cursor-pointer"
-          >
-            Apoiadores Voluntários →
-          </button>
-        </div>
-      </div>
+                      <div className="space-y-3.5 pt-2">
+                        <div className="flex items-start gap-2.5">
+                          <CheckCircle className="w-4 h-4 text-petro-green shrink-0 mt-1" />
+                          <span className="text-xs text-slate-700 font-semibold leading-normal">
+                            Adequação das competências aos requisitos das subcontratadas (EPCs).
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-2.5">
+                          <CheckCircle className="w-4 h-4 text-petro-green shrink-0 mt-1" />
+                          <span className="text-xs text-slate-700 font-semibold leading-normal">
+                            Transferência de tecnologia de excelência homologada pelo IFPELAC.
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-2.5">
+                          <CheckCircle className="w-4 h-4 text-petro-green shrink-0 mt-1" />
+                          <span className="text-xs text-slate-700 font-semibold leading-normal">
+                            Redução sistemática de assimetrias regionais de empregabilidade.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
 
-      {/* Extra Admin Status Alert */}
-      {isAdminLoggedIn && (
-        <div className="bg-amber-50 border-b border-amber-200 text-amber-900 px-4 py-2.5 text-center text-xs font-bold flex items-center justify-center gap-2 animate-fade-in" id="admin-banner-alert">
-          <ShieldCheck className="h-4.5 w-4.5 text-amber-700 animate-bounce" />
-          <span>ESTADO: ACESSO ADMINISTRADOR ATIVADO. Tem permissões para excluir anúncios e visualizar contactos proprietários nas vagas.</span>
-        </div>
-      )}
+                    {/* Bento grid layout parameters (right 7 columns) */}
+                    <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {/* Grid Item 1 */}
+                      <div className="bg-white border border-slate-200 p-6 rounded-3xl space-y-3 shadow-sm hover:shadow-md transition-all">
+                        <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-lg">👩🏾‍🔧</div>
+                        <h4 className="font-extrabold text-petro-green text-xs uppercase tracking-wider">Cotas de Gênero</h4>
+                        <p className="text-xs text-slate-500 leading-normal">
+                          Garantia mínima de <strong>50% de preenchimento</strong> de vagas para mulheres, promovendo igualdade de rendimentos no exigente setor industrial.
+                        </p>
+                      </div>
 
-      {/* Active User Greeting Card */}
-      {user && !isAdminLoggedIn && (
-        <div className="bg-green-50 border-b border-green-200 text-green-900 px-4 py-2 text-center text-xs font-medium flex items-center justify-center gap-2 animate-fade-in" id="user-welcome-alert">
-          <Award className="h-4.5 w-4.5 text-green-700" />
-          <span>
-            Bem-vindo de volta ao Netek Services, <strong className="font-extrabold text-[#ff6600]">{getUserFriendlyName(user)}</strong> (<span className="text-gray-500 font-mono text-[10px]">{user.email}</span>)! Agora pode submeter vagas e terrenos de imediato, registados em seu nome.
-          </span>
-        </div>
-      )}
+                      {/* Grid Item 2 */}
+                      <div className="bg-white border border-slate-200 p-6 rounded-3xl space-y-3 shadow-sm hover:shadow-md transition-all">
+                        <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-lg">💻</div>
+                        <h4 className="font-extrabold text-amber-600 text-xs uppercase tracking-wider">Eixo Tecnologia</h4>
+                        <p className="text-xs text-slate-500 leading-normal">
+                          Do letramento digital ao desenvolvimento de software fullstack. Integração de jovens na nova economia cibernética global.
+                        </p>
+                      </div>
 
-      {/* Moçambique Data Saver Friendly Alert */}
-      {isDataSaver && (
-        <div className="bg-orange-500 border-b border-orange-600 text-white px-4 py-2 text-center text-[11px] font-black flex items-center justify-center gap-2 animate-fade-in uppercase tracking-wider font-sans" id="datasaver-banner-alert">
-          <span>🚀 ECONOMIA DE DADOS ATIVA: Fotos de Imóveis ocultadas para poupar saldo e megas de internet em Moçambique! 🇲🇿</span>
-        </div>
-      )}
+                      {/* Grid Item 3 */}
+                      <div className="bg-white border border-slate-200 p-6 rounded-3xl space-y-3 shadow-sm hover:shadow-md transition-all">
+                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-lg">🛡️</div>
+                        <h4 className="font-extrabold text-blue-600 text-xs uppercase tracking-wider">Incentivos Frequência</h4>
+                        <p className="text-xs text-slate-500 leading-normal">
+                          Apoio à deslocação diária, fardamento profissional fornecido pela Petrobras e almoço quente servido diretamente no polo.
+                        </p>
+                      </div>
 
-      {/* Main Content Area */}
-      <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8" id="primary-view-container">
-        {activeModule === "engenharia" && <EngineeringModule isAdmin={isAdminLoggedIn} />}
-        {activeModule === "fixmoz" && <FixMozModule isAdmin={isAdminLoggedIn} />}
-        {activeModule === "digitais" && <DigitalServicesModule isAdmin={isAdminLoggedIn} />}
-        {activeModule === "kayamoz" && <KayamozModule isAdmin={isAdminLoggedIn} />}
-        {activeModule === "perfil" && <UserProfileModule user={user} isAdmin={isAdminLoggedIn} />}
+                      {/* Grid Item 4 */}
+                      <div className="bg-white border border-slate-200 p-6 rounded-3xl space-y-3 shadow-sm hover:shadow-md transition-all">
+                        <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-lg">🎓</div>
+                        <h4 className="font-extrabold text-indigo-600 text-xs uppercase tracking-wider">Certificação ANEP</h4>
+                        <p className="text-xs text-slate-500 leading-normal">
+                          Exame final prático certificado pela Autoridade Nacional de Educação Profissional (ANEP), habilitante para todas multinacionais.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Subpage Section: Quick highlighted courses block */}
+                <section className="bg-white py-14 border-t border-b border-slate-200">
+                  <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-10">
+                    <div className="text-center md:text-left space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-widest text-petro-green">Rotas Rápidas</span>
+                      <h3 className="text-2xl font-black text-slate-800">Cursos com Maior Demanda em Moçambique</h3>
+                      <p className="text-xs text-slate-500 max-w-lg mt-1">Algumas das carreiras técnicas industriais e digitais com vagas de contratação imediata nos polos nacionais:</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {/* Highlight 1 */}
+                      <div className="border border-slate-200 hover:border-slate-300 p-6 rounded-2xl bg-slate-50/50 flex flex-col justify-between hover:shadow-sm transition-all text-left">
+                        <div className="space-y-3">
+                          <span className="text-lg">⚡</span>
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Manutenção Industrial</h4>
+                          <h5 className="font-extrabold text-petro-green text-sm leading-snug">Eletricista Industrial de Manutenção</h5>
+                          <p className="text-xs text-slate-500 leading-relaxed font-normal">Capacitação avançada em esquemas e comandos em média e baixa tensão para subestações.</p>
+                        </div>
+                        <button 
+                          onClick={() => handleApplyForCourse('eletricista-ind')} 
+                          className="mt-6 text-petro-green font-semibold text-xs flex items-center gap-1.5 hover:underline cursor-pointer align-self-start"
+                        >
+                          Candidatar-se à vaga <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Highlight 2 */}
+                      <div className="border border-slate-200 hover:border-slate-300 p-6 rounded-2xl bg-slate-50/50 flex flex-col justify-between hover:shadow-sm transition-all text-left">
+                        <div className="space-y-3">
+                          <span className="text-lg">🔥</span>
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Montagem Pesada</h4>
+                          <h5 className="font-extrabold text-petro-green text-sm leading-snug">Soldador de Estruturas Industriais</h5>
+                          <p className="text-xs text-slate-500 leading-relaxed font-normal">Foco prático total em soldagem em altura, arco revestido e processos MIG/MAG em juntas metálicas.</p>
+                        </div>
+                        <button 
+                          onClick={() => handleApplyForCourse('soldador-est')} 
+                          className="mt-6 text-petro-green font-semibold text-xs flex items-center gap-1.5 hover:underline cursor-pointer align-self-start"
+                        >
+                          Candidatar-se à vaga <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Highlight 3 */}
+                      <div className="border border-slate-200 hover:border-slate-300 p-6 rounded-2xl bg-slate-50/50 flex flex-col justify-between hover:shadow-sm transition-all text-left">
+                        <div className="space-y-3">
+                          <span className="text-lg">💻</span>
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Nova Economia Digital</h4>
+                          <h5 className="font-extrabold text-petro-green text-sm leading-snug">Desenvolvedor Web Full Stack</h5>
+                          <p className="text-xs text-slate-500 leading-relaxed font-medium">Capacitação intensiva de software em Javascript, React, NodeJS e banco de dados relacionais.</p>
+                        </div>
+                        <button 
+                          onClick={() => handleApplyForCourse('desenvolvedor-fullstack')} 
+                          className="mt-6 text-petro-green font-semibold text-xs flex items-center gap-1.5 hover:underline cursor-pointer align-self-start"
+                        >
+                          Candidatar-se à vaga <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* View all courses button CTA */}
+                    <div className="text-center pt-4">
+                      <button
+                        onClick={() => setActiveSection('cursos')}
+                        className="bg-slate-800 hover:bg-slate-900 text-white font-bold px-6 py-3.5 rounded-xl text-xs transition-colors cursor-pointer"
+                      >
+                        Ver Catálogo Completo com {COURSES.length} Cursos
+                      </button>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Section: Sector News grounded on search */}
+                <SectorNews 
+                  onExploreCourse={handleApplyForCourse}
+                  onNavigateToSection={setActiveSection}
+                />
+
+                {/* Section: Student Testimonials bento grid */}
+                <Testimonials />
+              </div>
+            )}
+
+            {/* SCREEN 2: COURSE EXPLORER DIRECTORY */}
+            {activeSection === 'cursos' && (
+              <CourseExplorer 
+                onApplyForCourse={handleApplyForCourse}
+                selectedCourseIdFromQuiz={selectedCourseId}
+                clearQuizSelection={clearQuizSelection}
+              />
+            )}
+
+            {/* SCREEN 3: BENEFIT STIPEND CALCULATOR */}
+            {activeSection === 'calculadora' && (
+              <BenefitCalculator />
+            )}
+
+            {/* SCREEN 4: VOCATIONAL ORIENTATION QUIZ */}
+            {activeSection === 'orientador' && (
+              <CourseSelectorQuiz onSelectCourse={handleSelectCourseFromQuiz} />
+            )}
+
+            {/* SCREEN 5: ONLINE REGISTRATION FORM */}
+            {activeSection === 'inscricao' && (
+              <RegistrationForm 
+                preSelectedCourseId={selectedCourseId}
+                onSuccess={handleRegistrationCompleted}
+                setActiveSection={setActiveSection}
+              />
+            )}
+
+            {/* SCREEN 6: DEEP PROTOCOL APPLICATION TRACKER */}
+            {activeSection === 'acompanhar' && (
+              <ApplicationTracker />
+            )}
+
+            {/* SCREEN 7: HUBS / HUBS MAP VISUALIZER */}
+            {activeSection === 'centros' && (
+              <HubsList onSelectCourse={handleSelectCourseFromQuiz} />
+            )}
+
+            {/* SCREEN 8: FAQ ACCORDION LIST */}
+            {activeSection === 'faq' && (
+              <FAQSection />
+            )}
+
+          </motion.div>
+        </AnimatePresence>
       </main>
 
-      {/* Elegant Footer with copyright & Mozambican details */}
-      <footer className="bg-[#1e2b38] border-t border-white/5 py-12 px-4 text-gray-400 text-sm" id="main-corporate-footer">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="bg-white p-1 rounded-lg">
-                <div className="bg-[#ff6600] text-white w-7 h-7 rounded-md font-bold flex items-center justify-center text-sm">N</div>
-              </div>
-              <span className="font-extrabold text-white text-base">Netek Services</span>
-            </div>
-            <p className="text-xs leading-relaxed text-gray-400">
-              Uma plataforma integrada moçambicana orientada para a agilização de serviços imobiliários (Kayamoz), 
-              calculadora métrica de materiais, intermediação laboral (FixMoz) e minutas automatizadas de contratos.
-            </p>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-white mb-3 text-xs uppercase tracking-wider text-orange-400">Nossos Módulos</h4>
-            <ul className="space-y-1.5 text-xs">
-              <li><button onClick={() => setActiveModule("engenharia")} className="hover:text-white transition-colors">Engenharia Integrada</button></li>
-              <li><button onClick={() => setActiveModule("fixmoz")} className="hover:text-white transition-colors">Agência FixMoz</button></li>
-              <li><button onClick={() => setActiveModule("digitais")} className="hover:text-white transition-colors">Express Documentos</button></li>
-              <li><button onClick={() => setActiveModule("kayamoz")} className="hover:text-white transition-colors">Intermediação Imobiliária</button></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-white mb-3 text-xs uppercase tracking-wider text-orange-400">Contatos e Expediente</h4>
-            <p className="text-xs leading-relaxed text-gray-400 mb-2">
-              Direção-Geral Jonson JB<br />
-              Maputo, Moçambique
-            </p>
-            <p className="text-xs leading-relaxed text-gray-400">
-              E-mail: <a href="mailto:admin@jonsonjb.com" className="text-orange-400 hover:underline font-semibold text-xs">admin@jonsonjb.com</a><br />
-              WhatsApp: <a href="https://wa.me/258835109190" className="text-orange-400 hover:underline font-semibold text-xs">+258 83 510 9190</a>
-            </p>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto border-t border-white/5 pt-6 text-center text-xs space-y-2">
-          <p>© {new Date().getFullYear()} Netek Services (Jonson JB). Todos os direitos reservados.</p>
-          <p className="text-[10px] text-gray-500 font-mono">Construído em conformidade regulamentar com as leis fiscais e o Código Civil de Moçambique.</p>
-        </div>
-      </footer>
-
-      {/* Unified Register/Login Auth Modal Overlay */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        onAuthSuccess={handleAuthSuccess}
-      />
-
-      {/* Institutional Corporate overlay info modals */}
-      <CompanyModals
-        activeModal={companyModal}
-        onClose={() => setCompanyModal(null)}
-      />
+      {/* Shared Footer block */}
+      <Footer onNavigate={setActiveSection} />
     </div>
   );
 }
